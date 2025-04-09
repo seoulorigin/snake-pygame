@@ -5,6 +5,25 @@ Made with PyGame
 
 import pygame, sys, time, random
 
+###04/09
+from pychievements import tracker
+from pychievements.signals import goal_achieved
+from achievement import BigEater
+
+# 업적 등록 및 상태 변수
+tracker.register(BigEater)
+last_achievement_message = ""
+achievement_display_time = 0
+game_stats = {'food_eaten': 0}
+
+@goal_achieved.connect
+def on_achievement(tracked_id, achievement, goals, **kwargs):
+    global last_achievement_message, achievement_display_time
+    for g in goals:
+        last_achievement_message = f"{g['name']} - {g['description']}"
+        achievement_display_time = time.time()
+###
+
 
 # Difficulty settings
 # Easy      ->  10
@@ -130,8 +149,12 @@ while True:
 
     # Snake body growing mechanism
     snake_body.insert(0, list(snake_pos))
+
+    #04/09
     if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
         score += 1
+        game_stats['food_eaten'] += 1
+        tracker.evaluate("player1", BigEater, game_stats['food_eaten'])
         food_spawn = False
     else:
         snake_body.pop()
@@ -164,6 +187,14 @@ while True:
             game_over()
 
     show_score(1, white, 'consolas', 20)
+
+    ###04/09
+    if last_achievement_message and time.time() - achievement_display_time < 3:
+        font = pygame.font.SysFont('consolas', 20)
+        text = font.render(last_achievement_message, True, (255, 215, 0))
+        game_window.blit(text, (20, 40))
+
+
     # Refresh game screen
     pygame.display.update()
     # Refresh rate
