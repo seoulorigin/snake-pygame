@@ -8,13 +8,19 @@ import pygame, sys, time, random
 ###04/09
 from pychievements import tracker
 from pychievements.signals import goal_achieved
-from achievement import BigEater
+from achievement import BigEater, RightWalker
 
-# 업적 등록 및 상태 변수
-tracker.register(BigEater)
+### 업적 등록 및 상태 변수
 last_achievement_message = ""
 achievement_display_time = 0
-game_stats = {'food_eaten': 0}
+game_stats = {'food_eaten': 0, 'rightCnt' : 0}
+
+# 먹이 관련 업적
+tracker.register(BigEater)
+
+# 움직임 관련 업적
+tracker.register(RightWalker)
+
 
 @goal_achieved.connect
 def on_achievement(tracked_id, achievement, goals, **kwargs):
@@ -123,6 +129,9 @@ while True:
                 change_to = 'LEFT'
             if event.key == pygame.K_RIGHT or event.key == ord('d'):
                 change_to = 'RIGHT'
+                # 움직임 업적 추가
+                game_stats['rightCnt'] += 1
+                tracker.evaluate("player1", RightWalker, game_stats['rightCnt'])
             # Esc -> Create event to quit the game
             if event.key == pygame.K_ESCAPE:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
