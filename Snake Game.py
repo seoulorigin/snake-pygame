@@ -41,6 +41,16 @@ difficulty = 25
 
 # Window size
 frame_size_x = 720
+# 알림 메시지 애니메이션 관련 변수
+popup_y = -60
+popup_target_y = 50
+popup_direction = "down"
+popup_start_time = 0
+popup_hold_time = 2
+popup_width = 400
+popup_height = 60
+popup_x = (frame_size_x - popup_width) // 2
+
 frame_size_y = 480
 
 # Checks for errors encountered
@@ -198,22 +208,37 @@ while True:
     show_score(1, white, 'consolas', 20)
 
     ###04/09
-    if last_achievement_message and time.time() - achievement_display_time < 3:
-        popup_width = 400
-        popup_height = 60
-        popup_x = (frame_size_x - popup_width) // 2
-        popup_y = 50
+    # 알림 메시지 애니메이션
+    if last_achievement_message:
+        current_time = time.time()
+        if popup_direction == "down":
+            popup_y += 5
+            if popup_y >= popup_target_y:
+                popup_y = popup_target_y
+                popup_direction = "hold"
+                popup_start_time = current_time
+        elif popup_direction == "hold":
+            if current_time - popup_start_time > popup_hold_time:
+                popup_direction = "up"
+        elif popup_direction == "up":
+            popup_y -= 5
+            if popup_y < -popup_height:
+                last_achievement_message = ""
+                popup_y = -60
+                popup_direction = "down"
 
-        # 반투명 배경 사각형
         popup_surface = pygame.Surface((popup_width, popup_height), pygame.SRCALPHA)
-        popup_surface.fill((0, 0, 0, 180))  # 검정색, 투명도 180
+        popup_surface.fill((0, 0, 0, 180))
         game_window.blit(popup_surface, (popup_x, popup_y))
+
 
         # 텍스트
         font = pygame.font.Font('KR.ttf', 22)
-        text_surface = font.render(last_achievement_message, True, (255, 215, 0))  # 노란 글씨
+
+        text_surface = font.render(last_achievement_message, True, white)
         text_rect = text_surface.get_rect(center=(frame_size_x // 2, popup_y + popup_height // 2))
         game_window.blit(text_surface, text_rect)
+
 
     # Refresh game screen
     pygame.display.update()
