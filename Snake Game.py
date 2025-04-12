@@ -190,10 +190,21 @@ while True:
 
     ###04/09
     if last_achievement_message and time.time() - achievement_display_time < 3:
-        font = pygame.font.SysFont('consolas', 20)
-        text = font.render(last_achievement_message, True, (255, 215, 0))
-        game_window.blit(text, (20, 40))
+        popup_width = 400
+        popup_height = 60
+        popup_x = (frame_size_x - popup_width) // 2
+        popup_y = 50
 
+        # 반투명 배경 사각형
+        popup_surface = pygame.Surface((popup_width, popup_height), pygame.SRCALPHA)
+        popup_surface.fill((0, 0, 0, 180))  # 검정색, 투명도 180
+        game_window.blit(popup_surface, (popup_x, popup_y))
+
+        # 텍스트
+        font = pygame.font.Font('KR.ttf', 22)
+        text_surface = font.render(last_achievement_message, True, (255, 215, 0))  # 노란 글씨
+        text_rect = text_surface.get_rect(center=(frame_size_x // 2, popup_y + popup_height // 2))
+        game_window.blit(text_surface, text_rect)
 
     # Refresh game screen
     pygame.display.update()
