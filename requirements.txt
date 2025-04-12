@@ -1,0 +1,2 @@
+pychievements==0.1.2
+pygame==2.6.1
