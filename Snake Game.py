@@ -117,7 +117,7 @@ def game_over():
 
 # Score
 def show_score(choice, color, font, size):
-    score_font = pygame.font.SysFont(font, int(size * frame_size_x / 720))
+    score_font = pygame.font.Font('TR.ttf', int(size * frame_size_x / 720))
     score_surface = score_font.render('Score : ' + str(score), True, color)
     score_rect = score_surface.get_rect()
     if choice == 1:
@@ -130,7 +130,7 @@ def show_score(choice, color, font, size):
 def draw_menu():
     game_window.blit(background_img, (0, 0))
     # Draw game logo
-    font = pygame.font.SysFont('arial', int(frame_size_x/8))
+    font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     logo_surface = font.render('SNAKE GAME', True, green)
     logo_rect = logo_surface.get_rect()
     logo_rect.midtop = (frame_size_x/2, frame_size_y/4)
@@ -145,7 +145,7 @@ def draw_menu():
 def draw_pause_screen():
     game_window.blit(background_img, (0, 0))
     # Pause text
-    font = pygame.font.SysFont('arial', int(frame_size_x/8))
+    font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     pause_surface = font.render('PAUSED', True, white)
     pause_rect = pause_surface.get_rect()
     pause_rect.midtop = (frame_size_x/2, frame_size_y/4)
@@ -160,20 +160,20 @@ def draw_pause_screen():
 def draw_game_over():
     game_window.blit(background_img, (0, 0))
     # Game Over text
-    font = pygame.font.SysFont('arial', int(frame_size_x/8))
+    font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     game_over_surface = font.render('GAME OVER', True, red)
     game_over_rect = game_over_surface.get_rect()
     game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
     game_window.blit(game_over_surface, game_over_rect)
     # Show final score
-    show_score(0, white, 'arial', 40)
+    show_score(0, white, 'TR.ttf', 40)
     manager.draw_ui(game_window)
     pygame.display.update()
 
 # Draw countdown screen
 def draw_countdown():
     game_window.blit(background_img, (0, 0))
-    font = pygame.font.SysFont('arial', int(frame_size_x/6))
+    font = pygame.font.Font('TR.ttf', int(frame_size_x/6))
     if countdown_number > 0:
         count_surface = font.render(str(countdown_number), True, white)
     else:
@@ -347,6 +347,6 @@ while True:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over()
 
-        show_score(1, white, 'arial', 20)
+        show_score(1, white, 'TR.ttf', 20)
         pygame.display.update()
         fps_controller.tick(difficulty)
