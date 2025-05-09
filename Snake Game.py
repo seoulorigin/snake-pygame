@@ -12,14 +12,14 @@ import pygame_gui
 # Hard      ->  40
 # Harder    ->  60
 # Impossible->  120
-difficulty = 10
+difficulty = 25
 
 # 배경 이미지 불러오고 창 크기 설정
 background_img = pygame.image.load('background.png')
 orig_w, orig_h = background_img.get_width(), background_img.get_height()
 frame_size_y = 700
 frame_size_x = int(orig_w * (frame_size_y / orig_h))
-# 10의 배수로 내림
+# 배경 이미지 사이즈가 10단위가 아니라서 10의 배수로 내림
 frame_size_x -= frame_size_x % 10
 frame_size_y -= frame_size_y % 10
 background_img = pygame.transform.smoothscale(background_img, (frame_size_x, frame_size_y))
@@ -39,6 +39,7 @@ pygame.display.set_caption('Snake Game')
 game_window = pygame.display.set_mode((frame_size_x, frame_size_y))
 
 # pygame_gui 초기화 (도트 스타일 버튼을 위한 theme.json 필요)
+# https://pygame-gui.readthedocs.io/en/latest/index.html 참고
 manager = pygame_gui.UIManager((frame_size_x, frame_size_y), 'theme.json')
 
 # 색상 (R, G, B)
