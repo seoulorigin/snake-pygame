@@ -6,7 +6,7 @@ Made with PyGame
 import pygame, sys, time, random
 import pygame_gui
 
-# Difficulty settings
+# 난이도 설정
 # Easy      ->  10
 # Medium    ->  25
 # Hard      ->  40
@@ -14,34 +14,34 @@ import pygame_gui
 # Impossible->  120
 difficulty = 10
 
-# Set window height and adjust width to match background.png aspect ratio
+# 배경 이미지 불러오고 창 크기 설정
 background_img = pygame.image.load('background.png')
 orig_w, orig_h = background_img.get_width(), background_img.get_height()
 frame_size_y = 700
 frame_size_x = int(orig_w * (frame_size_y / orig_h))
-# Round to nearest lower multiple of 10
+# 10의 배수로 내림
 frame_size_x -= frame_size_x % 10
 frame_size_y -= frame_size_y % 10
 background_img = pygame.transform.smoothscale(background_img, (frame_size_x, frame_size_y))
 
-# Check for errors
+# 오류 체크
 check_errors = pygame.init()
-# pygame.init() example output -> (6, 0)
-# second number in tuple gives number of errors
+# pygame.init() 예시 출력 -> (6, 0)
+# 튜플의 두 번째 숫자가 에러 개수
 if check_errors[1] > 0:
-    print(f'[!] Had {check_errors[1]} errors when initialising game, exiting...')
+    print(f'[!] 초기화 중 {check_errors[1]}개의 에러가 발생하여 종료합니다...')
     sys.exit(-1)
 else:
-    print('[+] Game successfully initialised')
+    print('[+] 게임이 성공적으로 초기화되었습니다')
 
-# Initialize game window
+# 게임 창 초기화
 pygame.display.set_caption('Snake Game')
 game_window = pygame.display.set_mode((frame_size_x, frame_size_y))
 
-# Initialize pygame_gui
-manager = pygame_gui.UIManager((frame_size_x, frame_size_y))
+# pygame_gui 초기화 (도트 스타일 버튼을 위한 theme.json 필요)
+manager = pygame_gui.UIManager((frame_size_x, frame_size_y), 'theme.json')
 
-# Colors (R, G, B)
+# 색상 (R, G, B)
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 red = pygame.Color(255, 0, 0)
@@ -49,54 +49,54 @@ green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
 pink = pygame.Color(255, 192, 203)
 
-# FPS controller
+# FPS 컨트롤러
 fps_controller = pygame.time.Clock()
 
-# Game states
-GAME_STATE_MENU = 0    # Menu screen
-GAME_STATE_PLAYING = 1 # Playing
-GAME_STATE_PAUSED = 2  # Paused
-GAME_STATE_COUNTDOWN = 3  # Countdown
-GAME_STATE_GAME_OVER = 4  # Game Over
+# 게임 상태
+GAME_STATE_MENU = 0    # 시작 화면
+GAME_STATE_PLAYING = 1 # 게임 중
+GAME_STATE_PAUSED = 2  # 일시정지
+GAME_STATE_COUNTDOWN = 3  # 카운트다운
+GAME_STATE_GAME_OVER = 4  # 게임 오버
 current_state = GAME_STATE_MENU
 
-# Create start button
+# 시작 버튼 생성
 start_button = pygame_gui.elements.UIButton(
     relative_rect=pygame.Rect((frame_size_x//2 - frame_size_x//8, frame_size_y//2), (frame_size_x//4, frame_size_y//12)),
     text='Start Game',
     manager=manager
 )
 
-# Create pause screen button
+# 일시정지 화면 버튼 생성
 resume_button = pygame_gui.elements.UIButton(
     relative_rect=pygame.Rect((frame_size_x//2 - frame_size_x//8, frame_size_y//2 + frame_size_y//8), (frame_size_x//4, frame_size_y//12)),
     text='Resume',
     manager=manager
 )
-resume_button.hide()  # Hide resume button initially
+resume_button.hide()  # 처음에는 숨김
 
-# Create restart button
+# 재시작 버튼 생성
 restart_button = pygame_gui.elements.UIButton(
     relative_rect=pygame.Rect((frame_size_x//2 - frame_size_x//8, frame_size_y//2 + frame_size_y//8), (frame_size_x//4, frame_size_y//12)),
     text='Restart',
     manager=manager
 )
-restart_button.hide()  # Hide restart button initially
+restart_button.hide()  # 처음에는 숨김
 
-# Game variables
-snake_pos = [100, 50]  # Initial snake position
-snake_body = [[100, 50], [90, 50], [80, 50]]  # Snake body
-food_pos = [random.randrange(1, (frame_size_x//10)) * 10, random.randrange(1, (frame_size_y//10)) * 10]  # Food position
+# 게임 변수
+snake_pos = [100, 50]  # 뱀 머리 위치
+snake_body = [[100, 50], [90, 50], [80, 50]]  # 뱀 몸통
+food_pos = [random.randrange(1, (frame_size_x//10)) * 10, random.randrange(1, (frame_size_y//10)) * 10]  # 먹이 위치
 food_spawn = True
-direction = 'RIGHT'  # Initial direction
+direction = 'RIGHT'  # 초기 방향
 change_to = direction
 score = 0
 
-# Countdown variables
+# 카운트다운 변수
 countdown_time = 0
 countdown_number = 3
 
-# Reset game variables
+# 게임 변수 리셋 함수
 def reset_game():
     global snake_pos, snake_body, food_pos, food_spawn, direction, change_to, score
     snake_pos = [100, 50]
@@ -107,7 +107,7 @@ def reset_game():
     change_to = direction
     score = 0
 
-# Game Over
+# 게임 오버 처리 함수
 def game_over():
     global current_state
     current_state = GAME_STATE_GAME_OVER
@@ -115,21 +115,21 @@ def game_over():
     resume_button.hide()
     restart_button.show()
 
-# Score
+# 점수 표시 함수
 def show_score(choice, color, font, size):
     score_font = pygame.font.Font('TR.ttf', int(size * 1.2 * frame_size_x / 720))
     score_surface = score_font.render('Score : ' + str(score), True, (0, 0, 0))
     score_rect = score_surface.get_rect()
     if choice == 1:
-        score_rect.midtop = (frame_size_x/10, frame_size_y/48)  # slightly higher
+        score_rect.midtop = (frame_size_x/10, frame_size_y/48)  # 조금 더 위로
     else:
         score_rect.midtop = (frame_size_x/2, frame_size_y/1.25)
     game_window.blit(score_surface, score_rect)
 
-# Draw menu screen
+# 시작 화면 그리기 함수
 def draw_menu():
     game_window.blit(background_img, (0, 0))
-    # Draw game logo
+    # 게임 로고
     font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     logo_surface = font.render('SNAKE GAME', True, green)
     logo_rect = logo_surface.get_rect()
@@ -141,10 +141,9 @@ def draw_menu():
     manager.draw_ui(game_window)
     pygame.display.update()
 
-# Draw pause screen
+# 일시정지 화면 그리기 함수
 def draw_pause_screen():
     game_window.blit(background_img, (0, 0))
-    # Pause text
     font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     pause_surface = font.render('PAUSED', True, white)
     pause_rect = pause_surface.get_rect()
@@ -156,21 +155,19 @@ def draw_pause_screen():
     manager.draw_ui(game_window)
     pygame.display.update()
 
-# Draw game over screen
+# 게임 오버 화면 그리기 함수
 def draw_game_over():
     game_window.blit(background_img, (0, 0))
-    # Game Over text
     font = pygame.font.Font('TR.ttf', int(frame_size_x/8))
     game_over_surface = font.render('GAME OVER', True, red)
     game_over_rect = game_over_surface.get_rect()
     game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
     game_window.blit(game_over_surface, game_over_rect)
-    # Show final score
     show_score(0, white, 'TR.ttf', 40)
     manager.draw_ui(game_window)
     pygame.display.update()
 
-# Draw countdown screen
+# 카운트다운 화면 그리기 함수
 def draw_countdown():
     game_window.blit(background_img, (0, 0))
     font = pygame.font.Font('TR.ttf', int(frame_size_x/6))
@@ -183,7 +180,7 @@ def draw_countdown():
     game_window.blit(count_surface, count_rect)
     pygame.display.update()
 
-# Main game loop
+# 메인 게임 루프
 while True:
     time_delta = fps_controller.tick(60)/1000.0
     
@@ -222,7 +219,7 @@ while True:
                     reset_game()
                     
         elif current_state == GAME_STATE_PLAYING:
-            # Game controls
+            # 게임 조작
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     change_to = 'UP'
@@ -253,7 +250,7 @@ while True:
                 current_state = GAME_STATE_PLAYING
         draw_countdown()
     elif current_state == GAME_STATE_PLAYING:
-        # Prevent snake from moving in opposite direction
+        # 반대 방향으로 이동 방지
         if change_to == 'UP' and direction != 'DOWN':
             direction = 'UP'
         if change_to == 'DOWN' and direction != 'UP':
@@ -263,7 +260,7 @@ while True:
         if change_to == 'RIGHT' and direction != 'LEFT':
             direction = 'RIGHT'
 
-        # Move snake
+        # 뱀 이동
         if direction == 'UP':
             snake_pos[1] -= 10
         if direction == 'DOWN':
@@ -273,7 +270,7 @@ while True:
         if direction == 'RIGHT':
             snake_pos[0] += 10
 
-        # Snake body growing mechanism
+        # 뱀 몸통 증가
         snake_body.insert(0, list(snake_pos))
         if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
             score += 1
@@ -281,19 +278,19 @@ while True:
         else:
             snake_body.pop()
 
-        # Spawn food
+        # 먹이 생성
         if not food_spawn:
             food_pos = [random.randrange(1, (frame_size_x//10)) * 10, random.randrange(1, (frame_size_y//10)) * 10]
         food_spawn = True
 
-        # Graphics
+        # 그래픽 그리기
         game_window.blit(background_img, (0, 0))
         body_colors = [green, pygame.Color(181, 230, 29)]  # 초록, 연한초록
         for i, pos in enumerate(snake_body):
             color = body_colors[i % 2]
             if i == 0:
                 pygame.draw.rect(game_window, color, pygame.Rect(pos[0], pos[1], 10, 10))
-                # Draw small red Y-shaped tongue at the front in the moving direction
+                # 머리 방향에 Y자 혀와 눈 그리기
                 cx, cy = pos[0]+5, pos[1]+5
                 tongue_color = (220, 40, 40)
                 if direction == 'UP':
@@ -303,7 +300,6 @@ while True:
                     pygame.draw.line(game_window, tongue_color, (cx, pos[1]), tip, 2)
                     pygame.draw.line(game_window, tongue_color, tip, left, 2)
                     pygame.draw.line(game_window, tongue_color, tip, right, 2)
-                    # Eyes
                     pygame.draw.circle(game_window, (0,0,0), (cx-2, pos[1]+2), 1)
                     pygame.draw.circle(game_window, (0,0,0), (cx+2, pos[1]+2), 1)
                 elif direction == 'DOWN':
@@ -337,12 +333,13 @@ while True:
                 pygame.draw.rect(game_window, color, pygame.Rect(pos[0], pos[1], 10, 10))
         pygame.draw.rect(game_window, white, pygame.Rect(food_pos[0], food_pos[1], 10, 10))
 
-        # Game Over conditions
+        # 게임 오버 조건
+        # 창 범위 벗어나면 게임 오버
         if snake_pos[0] < 0 or snake_pos[0] >= frame_size_x:
             game_over()
         if snake_pos[1] < 0 or snake_pos[1] >= frame_size_y:
             game_over()
-        # Collision with snake body
+        # 몸통과 충돌하면 게임 오버
         for block in snake_body[1:]:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over()
